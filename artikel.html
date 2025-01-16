@@ -353,7 +353,7 @@
           </nav>
           <!-- End Navbar -->
         </div>
-<br><br>
+
         <div class="container mt-5">
           <div class="row">
             <div class="col-md-12">
@@ -374,7 +374,7 @@
                           placeholder="Masukkan judul artikel"
                         />
                       </div>
-        
+      
                       <!-- Sub Judul -->
                       <div class="form-group">
                         <label for="articleSubTitle">Sub Judul</label>
@@ -385,7 +385,7 @@
                           placeholder="Masukkan sub judul"
                         />
                       </div>
-        
+      
                       <!-- Deskripsi Sub Judul -->
                       <div class="form-group">
                         <label for="articleSubDesc">Deskripsi Sub Judul</label>
@@ -396,18 +396,7 @@
                           placeholder="Masukkan deskripsi sub judul"
                         ></textarea>
                       </div>
-        
-                      <!-- Upload Gambar -->
-                      <div class="form-group">
-                        <label for="articleImage">Unggah Gambar</label>
-                        <input
-                          type="file"
-                          class="form-control"
-                          id="articleImage"
-                          accept="image/*"
-                        />
-                      </div>
-        
+      
                       <!-- Kategori Artikel -->
                       <div class="form-group">
                         <label for="articleCategory">Kategori</label>
@@ -419,7 +408,7 @@
                           <option>Seputar Keong</option>
                         </select>
                       </div>
-        
+      
                       <!-- Isi Artikel -->
                       <div class="form-group">
                         <label for="articleContent">Isi Artikel</label>
@@ -430,7 +419,7 @@
                           placeholder="Masukkan isi artikel"
                         ></textarea>
                       </div>
-        
+      
                       <!-- Submit Artikel -->
                       <div class="form-group">
                         <button type="submit" class="btn btn-primary" onclick="submitArticle()">
@@ -443,7 +432,7 @@
               </div>
             </div>
           </div>
-        
+      
           <!-- Section untuk Menampilkan Artikel -->
           <div class="row mt-5">
             <div class="col-md-12">
@@ -471,10 +460,10 @@
             </div>
           </div>
         </div>
-        
+      
         <script>
           const articles = [];
-        
+      
           // Fungsi untuk menambahkan artikel
           function submitArticle() {
             const title = document.getElementById('articleTitle').value;
@@ -482,38 +471,30 @@
             const subDesc = document.getElementById('articleSubDesc').value;
             const category = document.getElementById('articleCategory').value;
             const content = document.getElementById('articleContent').value;
-            const imageFile = document.getElementById('articleImage').files[0];
-        
+      
             // Validasi input
-            if (title && subTitle && subDesc && category && content && imageFile) {
-              const reader = new FileReader();
-        
-              reader.onload = function (e) {
-                const article = {
-                  title,
-                  subTitle,
-                  subDesc,
-                  category,
-                  content,
-                  imageUrl: e.target.result,
-                };
-        
-                articles.push(article);
-                displayArticles();
-                clearForm();
+            if (title && subTitle && subDesc && category && content) {
+              const article = {
+                title,
+                subTitle,
+                subDesc,
+                category,
+                content,
               };
-        
-              reader.readAsDataURL(imageFile);
+      
+              articles.push(article);
+              displayArticles();
+              clearForm();
             } else {
               alert('Mohon lengkapi semua kolom');
             }
           }
-        
+      
           // Fungsi untuk menampilkan artikel ke dalam tabel
           function displayArticles() {
             const tableBody = document.getElementById('articleTableBody');
             tableBody.innerHTML = ''; // Clear the existing data
-        
+      
             articles.forEach((article, index) => {
               const row = document.createElement('tr');
               row.innerHTML = `
@@ -523,43 +504,16 @@
                 <td>${article.category}</td>
                 <td>
                   <button class="btn btn-sm btn-warning" onclick="editArticle(${index})">Edit</button>
-                  <button class="btn btn-sm btn-danger" onclick="deleteArticle(${index})">Delete</button>
+                  <button class="btn btn-sm btn-danger" onclick="deleteArticle(${pointId})">Delete</button>
                 </td>
               `;
               tableBody.appendChild(row);
             });
           }
-        
+      
           // Fungsi untuk menghapus artikel
-          function deleteArticle(pointId) {
-            const apiUrl = `http://localhost:1945/artikel/${pointId}`; // Ganti dengan URL API Anda
-
-            if (confirm('Apakah Anda yakin ingin menghapus artikel ini?')) {
-                fetch(apiUrl, {
-                    method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    console.log('Data berhasil dihapus:', data);
-                    alert('Data berhasil dihapus!');
-                    // Menghapus baris dari tabel setelah berhasil dihapus
-                    location.reload(); // Atau metode lain untuk memperbarui tabel
-                })
-                .catch(error => {
-                    console.error('Ada masalah dengan permintaan:', error);
-                    alert('Gagal menghapus data: ' + error.message);
-                });
-            }
-          }
-        
+          
+      
           // Fungsi untuk mengedit artikel
           function editArticle(index) {
             const article = articles[index];
@@ -568,13 +522,13 @@
             document.getElementById('articleSubDesc').value = article.subDesc;
             document.getElementById('articleCategory').value = article.category;
             document.getElementById('articleContent').value = article.content;
-        
+      
             // Change the submit button to update the article
             document.querySelector('button[type="submit"]').onclick = function () {
               updateArticle(index);
             };
           }
-        
+      
           // Fungsi untuk memperbarui artikel
           function updateArticle(index) {
             articles[index] = {
@@ -584,12 +538,12 @@
               category: document.getElementById('articleCategory').value,
               content: document.getElementById('articleContent').value,
             };
-        
+      
             displayArticles();
             clearForm();
             document.querySelector('button[type="submit"]').onclick = submitArticle;
           }
-        
+      
           // Fungsi untuk membersihkan form
           function clearForm() {
             document.getElementById('articleTitle').value = '';
@@ -597,10 +551,40 @@
             document.getElementById('articleSubDesc').value = '';
             document.getElementById('articleCategory').value = '';
             document.getElementById('articleContent').value = '';
-            document.getElementById('articleImage').value = '';
           }
         </script>
-        
+      <script>
+                  function deleteArticle(pointId) {
+   const apiUrl = `http://localhost:1945/artikel/${pointId}`; // Ganti dengan URL API Anda
+
+    if (confirm('Apakah Anda yakin ingin menghapus titik ini?')) {
+        fetch(apiUrl, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Data berhasil dihapus:', data);
+            alert('Data berhasil dihapus!');
+            // Menghapus baris dari tabel setelah berhasil dihapus
+            location.reload(); // Atau metode lain untuk memperbarui tabel
+        })
+        .catch(error => {
+            console.error('Ada masalah dengan permintaan:', error);
+            alert('Gagal menghapus data: ' + error.message);
+        });
+    }
+          }
+      </script>
+
+    </div>
     <!--   Core JS Files   -->
     <script src="assets/js/core/jquery-3.7.1.min.js"></script>
     <script src="assets/js/core/popper.min.js"></script>
