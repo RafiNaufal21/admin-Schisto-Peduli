@@ -256,7 +256,7 @@
                       </a>
                     </li>
                     <li>
-                      <a href="data_diagnosa,html">
+                      <a href="data_diagnosa.html">
                         <span class="sub-item">Data Diagnosa Dini</span>
                       </a>
                     </li>
@@ -415,97 +415,67 @@
 <br>
                 <!-- Form Titik Fokus Keong -->
                 <div class="container mt-5">
-                  <div class="row">
-                    <div class="col-md-12">
-                      <div class="card">
-                        <div class="card-header text-center">
-                          <img src="path-to-logo/kabupaten-poso-logo.png" alt="Logo Kabupaten Poso" style="width: 100px; height: auto;">
-                          <div class="card-title mt-3">Form Input Koordinat Titik Fokus Keong</div>
+                    <div class="row">
+                      <div class="col-md-12">
+                        <div class="card">
+                          <div class="card-header text-center">
+                            <img src="path-to-logo/kabupaten-poso-logo.png" alt="Logo Kabupaten Poso" style="width: 100px; height: auto;">
+                            <div class="card-title mt-3">Form Input Koordinat Titik Fokus Keong</div>
+                          </div>
+                          <div class="card-body">
+                            <!-- Nama Titik -->
+                            <div class="form-group mb-3">
+                              <label for="pointName">Nama Titik</label>
+                              <input type="text" class="form-control" id="pointName" placeholder="Masukkan nama titik">
+                            </div>
+                            <!-- Koordinat Titik -->
+                            <div class="form-group mb-3">
+                              <label for="coordinates">Koordinat</label>
+                              <input type="text" class="form-control" id="coordinates" placeholder="Masukkan koordinat titik">
+                            </div>
+                            <!-- Pilihan Desa -->
+                            <div class="form-group mb-3">
+                              <label for="villageSelect">Pilih Desa</label>
+                              <select class="form-select" id="villageSelect">
+                                <option value="">Pilih Desa</option>
+                              </select>
+                            </div>
+                            <div class="form-group mt-3 text-center">
+                              <button type="submit" class="btn btn-primary" onclick="addPointData()">Submit Data Titik</button>
+                            </div>
+                          </div>
                         </div>
-                        <div class="card-body">
-                          <!-- Nama Titik -->
-                          <div class="form-group mb-3">
-                            <label for="namatitik">Nama Titik</label>
-                            <input type="text" class="form-control" id="namatitik" placeholder="Masukkan nama titik">
+                      </div>
+                    </div>
+                  
+                    <!-- Tabel Koordinat Titik -->
+                    <div class="row mt-4">
+                      <div class="col-md-12">
+                        <div class="card">
+                          <div class="card-header">
+                            <div class="card-title">Daftar Koordinat Titik</div>
                           </div>
-                          <!-- Koordinat Titik -->
-                          <div class="form-group mb-3">
-                            <label for="koordinat">Koordinat</label>
-                            <input type="text" class="form-control" id="kordinat" placeholder="Masukkan koordinat titik">
-                          </div>
-                          <!-- Pilihan Desa -->
-                          <div class="form-group mb-3">
-                            <label for="villageSelect">Pilih Desa</label>
-                            <select class="form-select" id="villageSelect">
-                              <option value="">Pilih Desa</option>
-                            </select>
-                          </div>
-                          <div class="form-group mt-3 text-center">
-                            <button type="submit" class="btn btn-primary" id="submitButton" onclick="addPointData()">Submit Data Titik</button>
+                          <div class="card-body">
+                            <table class="table table-bordered">
+                              <thead>
+                                <tr>
+                                  <th>#</th>
+                                  <th>Nama Titik</th>
+                                  <th>Koordinat</th>
+                                  <th>Desa</th>
+                                  <th>Aksi</th>
+                                </tr>
+                              </thead>
+                              <tbody id="pointTableBody">
+                                <!-- Data Titik Akan Dimasukkan Di Sini -->
+                              </tbody>
+                            </table>
                           </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                
-                  <!-- Tabel Koordinat Titik -->
-                  <div class="row mt-4">
-                    <div class="col-md-12">
-                      <div class="card">
-                        <div class="card-header">
-                          <div class="card-title">Daftar Koordinat Titik</div>
-                        </div>
-                        <div class="card-body">
-                          <table class="table table-bordered">
-                            <thead>
-                              <tr>
-                                <th>#</th>
-                                <th>Nama Titik</th>
-                                <th>Koordinat</th>
-                                <th>Desa</th>
-                                <th>Aksi</th>
-                              </tr>
-                            </thead>
-                            <tbody id="pointTableBody">
-                              <!-- Data Titik Akan Dimasukkan Di Sini -->
-                            </tbody>
-                          </table>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <!--delete titik keong-->
-                  <script>
-                   function deletePoint(pointId) {
-    const apiUrl = `http://localhost:1945/delete/${pointId}`; // Ganti dengan URL API Anda
-
-    if (confirm('Apakah Anda yakin ingin menghapus titik ini?')) {
-        fetch(apiUrl, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log('Data berhasil dihapus:', data);
-            alert('Data berhasil dihapus!');
-            // Menghapus baris dari tabel setelah berhasil dihapus
-            location.reload(); // Atau metode lain untuk memperbarui tabel
-        })
-        .catch(error => {
-            console.error('Ada masalah dengan permintaan:', error);
-            alert('Gagal menghapus data: ' + error.message);
-        });
-    }
-}
-                  </script>
+                  
                   <script>
 let currentPoint = null; // Variabel global untuk menyimpan data point yang diambil
 
