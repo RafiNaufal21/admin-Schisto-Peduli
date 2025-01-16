@@ -42,6 +42,103 @@
     <link rel="stylesheet" href="assets/css/demo.css" />
   </head>
   <body>
+
+    <!--get api desa-->
+    <script>
+      fetch('http://localhost:1945/desa')
+          .then(response => {
+              if (!response.ok) {
+                  throw new Error('Network response was not ok');
+              }
+              return response.json();
+          })
+          .then(data => {
+              console.log("data desa:",data); // Memeriksa data
+              const dataDiv = document.getElementById('data');
+              const villageSelect = document.getElementById('villageSelect');
+              data.forEach(item => {
+                const option = document.createElement('option');
+                option.value = item.id; // Asumsi ada field id di dalam data
+                option.textContent = item.nama_desa; // Menggunakan nama_desa dari data
+                villageSelect.appendChild(option); // Menambahkan opsi ke select
+            });
+              if (data.items) {
+                  dataDiv.innerHTML = `<h2>${data.message}</h2><ul>${data.items.map(item => `<li>${item}</li>`).join('')}</ul>`;
+              } else {
+                  dataDiv.innerHTML = `<h2>${data.message}</h2><p>No items found.</p>`;
+              }
+          })
+          .catch(error => {
+              console.error('There was a problem with the fetch operation:', error);
+          });
+  </script>
+
+  <!--post titik keong-->
+  <script>
+      fetch('http://localhost:1945/jml', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data), // Mengonversi objek data menjadi string JSON
+    })    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.json();
+    })
+    .then(data => {
+      console.log('Data berhasil dikirim:', data);
+      // Lakukan tindakan tambahan setelah pengiriman
+    })
+    .catch(error => {
+      console.error('Ada masalah dengan permintaan:', error);
+    });
+  
+
+  // Panggil fungsi postData saat diperlukan
+  postData();
+  </script>
+    <!-- get api titik_keong -->
+    <script>
+      fetch('http://localhost:1945/jml')
+          .then(response => {
+              if (!response.ok) {
+                  throw new Error('Network response was not ok');
+              }
+              return response.json();
+          })
+          .then(data => {
+              console.log("data titik_keong :",data.titik_keong); // Memeriksa data
+              const tableBody = document.getElementById('pointTableBody');
+                tableBody.innerHTML = ''; // Kosongkan tbody sebelum menambahkan data
+
+                data.titik_keong.forEach(point => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${point.id}</td>
+                        <td>${point.nama}</td>
+                        <td>${point.kordinat}</td>
+                        <td>${point.desa}</td>
+                        <td>
+                            <button class="btn btn-primary" onclick="populateForm(${point.id})">Edit</button>
+                            <button class="btn btn-danger" onclick="deletePoint(${point.id})">Delete</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+
+              const dataDiv = document.getElementById('data');
+              if (data.items) {
+                  dataDiv.innerHTML = `<h2>${data.message}</h2><ul>${data.items.map(item => `<li>${item}</li>`).join('')}</ul>`;
+              } else {
+                  dataDiv.innerHTML = `<h2>${data.message}</h2><p>No items found.</p>`;
+              }
+          })
+          .catch(error => {
+              console.error('There was a problem with the fetch operation:', error);
+          });
+  </script>
     <div class="wrapper">
       <!-- Sidebar -->
       <div class="sidebar" data-background-color="dark">
@@ -322,7 +419,7 @@
                       <div class="col-md-12">
                         <div class="card">
                           <div class="card-header text-center">
-                            <img src="./assets/img/Lambang_Kabupaten_Poso.png" alt="Logo Kabupaten Poso" style="width: 100px; height: auto;" />
+                            <img src="path-to-logo/kabupaten-poso-logo.png" alt="Logo Kabupaten Poso" style="width: 100px; height: auto;">
                             <div class="card-title mt-3">Form Input Koordinat Titik Fokus Keong</div>
                           </div>
                           <div class="card-body">
@@ -380,64 +477,198 @@
                   </div>
                   
                   <script>
-                    let pointData = []; // Menyimpan data titik
-                  
-                    // Menambahkan data titik
-                    function addPointData() {
-                      const pointName = document.getElementById("pointName").value;
-                      const coordinates = document.getElementById("coordinates").value;
-                      const village = document.getElementById("villageSelect").value;
-                  
-                      const newPoint = {
-                        name: pointName,
-                        coordinates: coordinates,
-                        village: village
-                      };
-                      pointData.push(newPoint);
-                  
-                      displayPointData();
-                  
-                      document.getElementById("pointName").value = '';
-                      document.getElementById("coordinates").value = '';
-                      document.getElementById("villageSelect").value = '';
+let currentPoint = null; // Variabel global untuk menyimpan data point yang diambil
+
+function populateForm(pointId) {
+    const apiUrl = `http://localhost:1945/lokasi/${pointId}`;
+    console.log(`Memanggil API untuk ID: ${pointId}`);
+
+    fetch(apiUrl)
+        .then(response => {
+            if (!response.ok) {
+                console.error('Response tidak ok:', response.statusText);
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(point => {
+            console.log('Data yang diterima:', point[0]);
+            currentPoint = point[0]; // Simpan data point ke variabel global
+
+            // Mengisi nilai input dengan data yang diterima
+            document.getElementById('namatitik').value = currentPoint.nama || '';
+            document.getElementById('kordinat').value = currentPoint.kordinat || '';
+            
+          //   .then(data => {
+          //     console.log("data desa:",data); // Memeriksa data
+          //     const dataDiv = document.getElementById('data');
+          //     const villageSelect = document.getElementById('villageSelect');
+          //     data.forEach(item => {
+          //       const option = document.createElement('option');
+          //       option.value = item.id; // Asumsi ada field id di dalam data
+          //       option.textContent = item.nama_desa; // Menggunakan nama_desa dari data
+          //       villageSelect.appendChild(option); // Menambahkan opsi ke select
+          //   });
+          //     if (data.items) {
+          //         dataDiv.innerHTML = `<h2>${data.message}</h2><ul>${data.items.map(item => `<li>${item}</li>`).join('')}</ul>`;
+          //     } else {
+          //         dataDiv.innerHTML = `<h2>${data.message}</h2><p>No items found.</p>`;
+          //     }
+          // })
+            // Mengambil data desa
+            fetch('http://localhost:1945/desa')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
                     }
-                  
-                    function displayPointData() {
-                      const pointTableBody = document.getElementById("pointTableBody");
-                      pointTableBody.innerHTML = '';
-                  
-                      pointData.forEach((point, index) => {
-                        const row = document.createElement("tr");
-                        row.innerHTML = `
-                          <td>${index + 1}</td>
-                          <td>${point.name}</td>
-                          <td>${point.coordinates}</td>
-                          <td>${point.village}</td>
-                          <td>
-                            <button class="btn btn-warning" onclick="editPoint(${index})">Ubah</button>
-                            <button class="btn btn-danger" onclick="deletePoint(${index})">Hapus</button>
-                          </td>
-                        `;
-                        pointTableBody.appendChild(row);
-                      });
-                    }
-                  
-                    function editPoint(index) {
-                      const point = pointData[index];
-                      document.getElementById("pointName").value = point.name;
-                      document.getElementById("coordinates").value = point.coordinates;
-                      document.getElementById("villageSelect").value = point.village;
-                  
-                      pointData.splice(index, 1);
-                      displayPointData();
-                    }
-                  
-                    function deletePoint(index) {
-                      if (confirm("Apakah Anda yakin ingin menghapus data titik ini?")) {
-                        pointData.splice(index, 1);
-                        displayPointData();
-                      }
-                    }
+                    return response.json();
+                })
+                .then(villages => {
+                    const villageSelect = document.getElementById('villageSelect');
+                    villageSelect.innerHTML = `<option value=${currentPoint.desa}>${currentPoint.desa}</option>`;
+                    villages.forEach(item => {
+                      const option = document.createElement('option');
+                      option.value = item.id; // Asumsi ada field id di dalam data
+                      option.textContent = item.nama_desa; // Menggunakan nama_desa dari data
+                      villageSelect.appendChild(option); // Menambahkan opsi ke select
+            });
+                });
+
+            // Mengubah tombol untuk memperbarui data
+            const submitButton = document.getElementById('submitButton');
+            submitButton.textContent = 'Ubah Data';
+            submitButton.onclick = () => updatePointData(pointId);
+        })
+        .catch(error => {
+            console.error('Ada masalah dengan permintaan:', error);
+        });
+}
+
+function updatePointData(pointId) {
+    const pointName = document.getElementById('namatitik').value;
+    const coordinates = document.getElementById('kordinat').value;
+    const village = document.getElementById('villageSelect').value;
+    const villageName = villageSelect.options[villageSelect.selectedIndex].text;
+
+    console.log(pointName,coordinates,village)
+
+    if (!pointName || !coordinates || !village) {
+        alert('Semua field harus diisi!');
+        return;
+    }
+
+    const apiUrl = `http://localhost:1945/edit/${pointId}`;
+    
+    const coordsArray = coordinates.split(' ');
+    if (coordsArray.length !== 2) {
+        alert('Format koordinat salah! Gunakan format: latitude,longitude');
+        return;
+    }
+
+    const latitude = parseFloat(coordsArray[0].trim());
+    const longitude = parseFloat(coordsArray[1].trim());
+    console.log("kordinat nya : ",latitude,longitude)
+
+    if (isNaN(latitude) || isNaN(longitude)) {
+        alert('Pastikan latitude dan longitude adalah angka!');
+        return;
+    }
+    const kordinat = `${latitude} ${longitude}`
+    const data = {
+        nama: pointName,
+        kordinat:kordinat,
+        desa: villageName,
+    };
+    fetch(apiUrl, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Data berhasil diupdate:', data);
+        alert('Data berhasil diupdate!');
+        location.reload();
+    })
+    .catch(error => {
+        console.error('Ada masalah dengan permintaan:', error);
+    });
+}
+                  </script>
+                  <script>
+                    
+function addPointData() {
+  const pointName = document.getElementById('namatitik').value;
+  const coordinates = document.getElementById('kordinat').value;
+  const village = document.getElementById('villageSelect').value;
+  const villageName = villageSelect.options[villageSelect.selectedIndex].text;
+
+  // Validasi input
+  if (!pointName || !coordinates || !village) {
+    alert('Semua field harus diisi!');
+    return;
+  }
+
+  const apiUrl = 'http://localhost:1945/lokasi'; // Ganti dengan URL API Anda
+  
+      const coordsArray = coordinates.split(' ');
+    if (coordsArray.length !== 2) {
+      alert('Format koordinat salah! Gunakan format: latitude,longitude');
+      return;
+    }
+
+    const latitude = parseFloat(coordsArray[0].trim());
+    const longitude = parseFloat(coordsArray[1].trim());
+
+    if (isNaN(latitude) || isNaN(longitude)) {
+      alert('Pastikan latitude dan longitude adalah angka!');
+      return;
+    }
+
+    const data = {
+      nama: pointName,
+      kordinat: [
+        {
+          latitude: latitude,
+          longitude: longitude
+        }
+      ],
+      desa: villageName,
+    };
+
+  fetch(apiUrl, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    return response.json();
+  })
+  .then(data => {
+    console.log('Data berhasil dikirim:', data);
+    // Reset form setelah pengiriman
+    document.getElementById('namatitik').value = '';
+    document.getElementById('kordinat').value = '';
+    document.getElementById('villageSelect').value = '';
+    // Tampilkan pesan sukses atau lakukan tindakan lain
+    alert('Data berhasil dikirim!');
+  })
+  .catch(error => {
+    console.error('Ada masalah dengan permintaan:', error);
+  });
+}
                   </script>
                   
 <!--   Core JS Files   -->

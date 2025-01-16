@@ -42,6 +42,47 @@
     <link rel="stylesheet" href="assets/css/demo.css" />
   </head>
   <body>
+
+    <!--get data artikel-->
+    <script>
+      fetch('http://localhost:1945/artikel')
+          .then(response => {
+              if (!response.ok) {
+                  throw new Error('Network response was not ok');
+              }
+              return response.json();
+          })
+          .then(data => {
+              console.log("data artikel :",data); // Memeriksa data
+              const tableBody = document.getElementById('articleTableBody');
+                tableBody.innerHTML = ''; // Kosongkan tbody sebelum menambahkan data
+
+                data.artikel.forEach(point => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${point.id}</td>
+                        <td>${point.judul}</td>
+                        <td>${point.subjudul}</td>
+                        <td>${point.kategori}</td>
+                        <td>
+                            <button class="btn btn-primary" onclick="populateForm(${point.id})">Edit</button>
+                            <button class="btn btn-danger" onclick="deletePoint(${point.id})">Delete</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+
+              const dataDiv = document.getElementById('data');
+              if (data.items) {
+                  dataDiv.innerHTML = `<h2>${data.message}</h2><ul>${data.items.map(item => `<li>${item}</li>`).join('')}</ul>`;
+              } else {
+                  dataDiv.innerHTML = `<h2>${data.message}</h2><p>No items found.</p>`;
+              }
+          })
+          .catch(error => {
+              console.error('There was a problem with the fetch operation:', error);
+          });
+  </script>
     <!-- Sidebar -->
     <div class="wrapper">
       <div class="sidebar" data-background-color="dark">
@@ -329,7 +370,7 @@
                         <input
                           type="text"
                           class="form-control"
-                          id="articleTitle"
+                          id="judul_artikel"
                           placeholder="Masukkan judul artikel"
                         />
                       </div>
@@ -340,7 +381,7 @@
                         <input
                           type="text"
                           class="form-control"
-                          id="articleSubTitle"
+                          id="subjudul_artikel"
                           placeholder="Masukkan sub judul"
                         />
                       </div>
@@ -350,7 +391,7 @@
                         <label for="articleSubDesc">Deskripsi Sub Judul</label>
                         <textarea
                           class="form-control"
-                          id="articleSubDesc"
+                          id="deskripsi_subjudl"
                           rows="3"
                           placeholder="Masukkan deskripsi sub judul"
                         ></textarea>
@@ -370,7 +411,7 @@
                       <!-- Kategori Artikel -->
                       <div class="form-group">
                         <label for="articleCategory">Kategori</label>
-                        <select class="form-select" id="articleCategory">
+                        <select class="form-select" id="kategori">
                           <option>Pilih kategori</option>
                           <option>Teknologi</option>
                           <option>Kesehatan</option>
@@ -384,7 +425,7 @@
                         <label for="articleContent">Isi Artikel</label>
                         <textarea
                           class="form-control"
-                          id="articleContent"
+                          id="isi_artikel"
                           rows="10"
                           placeholder="Masukkan isi artikel"
                         ></textarea>
@@ -490,9 +531,33 @@
           }
         
           // Fungsi untuk menghapus artikel
-          function deleteArticle(index) {
-            articles.splice(index, 1);
-            displayArticles();
+          function deleteArticle(pointId) {
+            const apiUrl = `http://localhost:1945/artikel/${pointId}`; // Ganti dengan URL API Anda
+
+            if (confirm('Apakah Anda yakin ingin menghapus artikel ini?')) {
+                fetch(apiUrl, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Data berhasil dihapus:', data);
+                    alert('Data berhasil dihapus!');
+                    // Menghapus baris dari tabel setelah berhasil dihapus
+                    location.reload(); // Atau metode lain untuk memperbarui tabel
+                })
+                .catch(error => {
+                    console.error('Ada masalah dengan permintaan:', error);
+                    alert('Gagal menghapus data: ' + error.message);
+                });
+            }
           }
         
           // Fungsi untuk mengedit artikel
