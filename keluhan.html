@@ -422,7 +422,8 @@
     function searchKeluhan() {
       const searchInput = document.getElementById('searchInput').value.toLowerCase();
       filteredData = keluhan.filter(data =>
-        data.nama.toLowerCase().includes(searchInput) || data.alasan.toLowerCase().includes(searchInput)
+        data.nama.toLowerCase().includes(searchInput) || data.kontak.toLowerCase().includes(searchInput)
+        || data.alasan.toLowerCase().includes(searchInput)|| data.isi.toLowerCase().includes(searchInput)
       );
       currentPage = 1; // Reset ke halaman 1 saat melakukan pencarian baru
       displayKeluhanData(currentPage);
