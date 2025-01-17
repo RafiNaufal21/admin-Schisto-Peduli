@@ -529,23 +529,6 @@ function populateForm(pointId) {
             document.getElementById('namatitik').value = currentPoint.nama || '';
             document.getElementById('kordinat').value = currentPoint.kordinat || '';
             
-          //   .then(data => {
-          //     console.log("data desa:",data); // Memeriksa data
-          //     const dataDiv = document.getElementById('data');
-          //     const villageSelect = document.getElementById('villageSelect');
-          //     data.forEach(item => {
-          //       const option = document.createElement('option');
-          //       option.value = item.id; // Asumsi ada field id di dalam data
-          //       option.textContent = item.nama_desa; // Menggunakan nama_desa dari data
-          //       villageSelect.appendChild(option); // Menambahkan opsi ke select
-          //   });
-          //     if (data.items) {
-          //         dataDiv.innerHTML = `<h2>${data.message}</h2><ul>${data.items.map(item => `<li>${item}</li>`).join('')}</ul>`;
-          //     } else {
-          //         dataDiv.innerHTML = `<h2>${data.message}</h2><p>No items found.</p>`;
-          //     }
-          // })
-            // Mengambil data desa
             fetch('http://localhost:1945/desa')
                 .then(response => {
                     if (!response.ok) {
@@ -694,6 +677,8 @@ function addPointData() {
     document.getElementById('villageSelect').value = '';
     // Tampilkan pesan sukses atau lakukan tindakan lain
     alert('Data berhasil dikirim!');
+    location.reload()
+    
   })
   .catch(error => {
     console.error('Ada masalah dengan permintaan:', error);

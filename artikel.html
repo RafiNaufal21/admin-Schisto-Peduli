@@ -66,7 +66,7 @@
                         <td>${point.kategori}</td>
                         <td>
                             <button class="btn btn-primary" onclick="populateForm(${point.id})">Edit</button>
-                            <button class="btn btn-danger" onclick="deletePoint(${point.id})">Delete</button>
+                            <button class="btn btn-danger" onclick="deleteArticle(${point.id})">Delete</button>
                         </td>
                     `;
                     tableBody.appendChild(row);
@@ -370,7 +370,7 @@
                         <input
                           type="text"
                           class="form-control"
-                          id="judul_artikel"
+                          id="judul"
                           placeholder="Masukkan judul artikel"
                         />
                       </div>
@@ -381,7 +381,7 @@
                         <input
                           type="text"
                           class="form-control"
-                          id="subjudul_artikel"
+                          id="subjudul"
                           placeholder="Masukkan sub judul"
                         />
                       </div>
@@ -391,7 +391,7 @@
                         <label for="articleSubDesc">Deskripsi Sub Judul</label>
                         <textarea
                           class="form-control"
-                          id="deskripsi_subjudl"
+                          id="deskripsi_subjudul"
                           rows="3"
                           placeholder="Masukkan deskripsi sub judul"
                         ></textarea>
@@ -401,11 +401,11 @@
                       <div class="form-group">
                         <label for="articleCategory">Kategori</label>
                         <select class="form-select" id="kategori">
-                          <option>Pilih kategori</option>
-                          <option>Teknologi</option>
-                          <option>Kesehatan</option>
-                          <option>Schistosomiasis</option>
-                          <option>Seputar Keong</option>
+                          <option value="">Pilih kategori</option>
+                          <option value="Teknologi">Teknologi</option>
+                          <option value="Kesehatan">Kesehatan</option>
+                          <option value="Schistosomiasis">Schistosomiasis</option>
+                          <option value="Seputar Keong">Seputar Keong</option>
                         </select>
                       </div>
       
@@ -422,7 +422,7 @@
       
                       <!-- Submit Artikel -->
                       <div class="form-group">
-                        <button type="submit" class="btn btn-primary" onclick="submitArticle()">
+                        <button type="submit" class="btn btn-primary" id="submitButton" onclick="addPointData()">
                           Submit Artikel
                         </button>
                       </div>
@@ -460,104 +460,13 @@
             </div>
           </div>
         </div>
-      
-        <script>
-          const articles = [];
-      
-          // Fungsi untuk menambahkan artikel
-          function submitArticle() {
-            const title = document.getElementById('articleTitle').value;
-            const subTitle = document.getElementById('articleSubTitle').value;
-            const subDesc = document.getElementById('articleSubDesc').value;
-            const category = document.getElementById('articleCategory').value;
-            const content = document.getElementById('articleContent').value;
-      
-            // Validasi input
-            if (title && subTitle && subDesc && category && content) {
-              const article = {
-                title,
-                subTitle,
-                subDesc,
-                category,
-                content,
-              };
-      
-              articles.push(article);
-              displayArticles();
-              clearForm();
-            } else {
-              alert('Mohon lengkapi semua kolom');
-            }
-          }
-      
-          // Fungsi untuk menampilkan artikel ke dalam tabel
-          function displayArticles() {
-            const tableBody = document.getElementById('articleTableBody');
-            tableBody.innerHTML = ''; // Clear the existing data
-      
-            articles.forEach((article, index) => {
-              const row = document.createElement('tr');
-              row.innerHTML = `
-                <td>${index + 1}</td>
-                <td>${article.title}</td>
-                <td>${article.subTitle}</td>
-                <td>${article.category}</td>
-                <td>
-                  <button class="btn btn-sm btn-warning" onclick="editArticle(${index})">Edit</button>
-                  <button class="btn btn-sm btn-danger" onclick="deleteArticle(${pointId})">Delete</button>
-                </td>
-              `;
-              tableBody.appendChild(row);
-            });
-          }
-      
-          // Fungsi untuk menghapus artikel
-          
-      
-          // Fungsi untuk mengedit artikel
-          function editArticle(index) {
-            const article = articles[index];
-            document.getElementById('articleTitle').value = article.title;
-            document.getElementById('articleSubTitle').value = article.subTitle;
-            document.getElementById('articleSubDesc').value = article.subDesc;
-            document.getElementById('articleCategory').value = article.category;
-            document.getElementById('articleContent').value = article.content;
-      
-            // Change the submit button to update the article
-            document.querySelector('button[type="submit"]').onclick = function () {
-              updateArticle(index);
-            };
-          }
-      
-          // Fungsi untuk memperbarui artikel
-          function updateArticle(index) {
-            articles[index] = {
-              title: document.getElementById('articleTitle').value,
-              subTitle: document.getElementById('articleSubTitle').value,
-              subDesc: document.getElementById('articleSubDesc').value,
-              category: document.getElementById('articleCategory').value,
-              content: document.getElementById('articleContent').value,
-            };
-      
-            displayArticles();
-            clearForm();
-            document.querySelector('button[type="submit"]').onclick = submitArticle;
-          }
-      
-          // Fungsi untuk membersihkan form
-          function clearForm() {
-            document.getElementById('articleTitle').value = '';
-            document.getElementById('articleSubTitle').value = '';
-            document.getElementById('articleSubDesc').value = '';
-            document.getElementById('articleCategory').value = '';
-            document.getElementById('articleContent').value = '';
-          }
-        </script>
+
+      <!--delete artikel-->
       <script>
                   function deleteArticle(pointId) {
    const apiUrl = `http://localhost:1945/artikel/${pointId}`; // Ganti dengan URL API Anda
 
-    if (confirm('Apakah Anda yakin ingin menghapus titik ini?')) {
+    if (confirm('Apakah Anda yakin ingin menghapus artikel ini?')) {
         fetch(apiUrl, {
             method: 'DELETE',
             headers: {
@@ -583,6 +492,146 @@
     }
           }
       </script>
+
+<!--tambah artikel-->
+<script>
+  function addPointData() {
+    const judul = document.getElementById('judul').value;
+    const isi_artikel = document.getElementById('isi_artikel').value;
+    const subJudul = document.getElementById('subjudul').value; // Ubah nama variabel
+    const subDeskripsi = document.getElementById('deskripsi_subjudul').value; // Ubah nama variabel
+    const kategori = document.getElementById('kategori').value; // Ambil nilai dari kategori
+  
+    // Validasi input
+    if (!judul || !isi_artikel || (!subJudul && !subDeskripsi)) {
+      alert('Semua field harus diisi!');
+      return;
+    }
+  
+    const apiUrl = 'http://localhost:1945/artikel';
+    const data = {
+      judul: judul,
+      isi: isi_artikel, // Pastikan ini sesuai dengan API
+      subJudul: subJudul, // Pastikan ini sesuai dengan API
+      subDeskripsi: subDeskripsi, // Pastikan ini sesuai dengan API
+      kategori: kategori // Pastikan ini adalah string
+    };
+  
+    console.log('Data yang akan dikirim:', data);
+  
+    fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    })
+    .then(response => {
+      if (!response.ok) {
+        return response.text().then(text => { throw new Error(text); });
+      }
+      return response.json();
+    })
+    .then(data => {
+      console.log('Data berhasil dikirim:', data);
+      // Reset form setelah pengiriman
+      document.getElementById('judul').value = '';
+      document.getElementById('subjudul').value = '';
+      document.getElementById('deskripsi_subjudul').value = '';
+      document.getElementById('kategori').value = '';
+      document.getElementById('isi_artikel').value = '';
+      alert('Data berhasil dikirim!');
+    })
+    .catch(error => {
+      console.error('Ada masalah dengan permintaan:', error);
+    });
+  }
+  </script>
+
+<script>
+  let currentPoint = null; // Variabel global untuk menyimpan data point yang diambil
+  
+  function populateForm(pointId) {
+      const apiUrl = `http://localhost:1945/artikel/${pointId}`;
+      console.log(`Memanggil API untuk ID: ${pointId}`);
+  
+      fetch(apiUrl)
+          .then(response => {
+              if (!response.ok) {
+                  console.error('Response tidak ok:', response.statusText);
+                  throw new Error('Network response was not ok');
+              }
+              return response.json();
+          })
+          .then(point => {
+              console.log('Data yang diterima:', point);
+              currentPoint = point; // Simpan data point ke variabel global
+  
+              // Mengisi nilai input dengan data yang diterima
+      document.getElementById('judul').value = currentPoint.judul || "";
+      document.getElementById('isi_artikel').value=currentPoint.deskripsi || ""
+      document.getElementById('subjudul').value = currentPoint.subjudul || ""
+      document.getElementById('deskripsi_subjudul').value = currentPoint.subdeskripsi|| ""
+      const kategoriSelect = document.getElementById('kategori');
+      kategoriSelect.value = currentPoint.kategori || ""; 
+  
+              // Mengubah tombol untuk memperbarui data
+              const submitButton = document.getElementById('submitButton');
+              submitButton.textContent = 'Ubah Data';
+              submitButton.onclick = () => updatePointData(pointId);
+          })
+          .catch(error => {
+              console.error('Ada masalah dengan permintaan:', error);
+          });
+  }
+  
+  function updatePointData(pointId) {
+    const judul = document.getElementById('judul').value;
+    const subjudul = document.getElementById('subjudul').value;
+    const subdeskripsi = document.getElementById('deskripsi_subjudul').value; // Memperbaiki kesalahan penamaan
+    const kategori = document.getElementById('kategori').value;
+    const deskripsi = document.getElementById('isi_artikel').value;
+
+    console.log(judul, subjudul, subdeskripsi, kategori, deskripsi);
+
+    if (!judul || !subjudul || !subdeskripsi || !kategori || !deskripsi) { // Memperbaiki kesalahan di validasi
+        alert('Semua field harus diisi!');
+        return;
+    }
+
+    const apiUrl = `http://localhost:1945/artikel/${pointId}`;
+
+    const data = {
+        judul: judul,
+        isi: deskripsi, // Pastikan ini sesuai dengan API
+        subjudul: subjudul, // Pastikan ini sesuai dengan API
+        subdeskripsi: subdeskripsi, // Pastikan ini sesuai dengan API
+        kategori: kategori // Pastikan ini adalah string
+    };
+
+    fetch(apiUrl, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.text().then(text => { throw new Error(text); });
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Data berhasil diupdate:', data);
+        alert('Data berhasil diupdate!');
+        location.reload();
+    })
+    .catch(error => {
+        console.error('Ada masalah dengan permintaan:', error);
+    });
+}
+                    </script> 
 
     </div>
     <!--   Core JS Files   -->

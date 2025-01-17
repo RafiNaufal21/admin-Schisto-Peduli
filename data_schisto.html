@@ -42,6 +42,48 @@
     <link rel="stylesheet" href="assets/css/demo.css" />
   </head>
   <body>
+
+    <!--get data statistik-->
+    <script>
+      fetch('http://localhost:1945/statistik')
+          .then(response => {
+              if (!response.ok) {
+                  throw new Error('Network response was not ok');
+              }
+              return response.json();
+          })
+          .then(data => {
+              console.log("data  :",data); // Memeriksa data
+              const tableBody = document.getElementById('statistikData');
+                tableBody.innerHTML = ''; // Kosongkan tbody sebelum menambahkan data
+
+                data.artikel.forEach(point => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${point.id}</td>
+                        <td>${point.judul}</td>
+                        <td>${point.subjudul}</td>
+                        <td>${point.kategori}</td>
+                        <td>
+                            <button class="btn btn-primary" onclick="populateForm(${point.id})">Edit</button>
+                            <button class="btn btn-danger" onclick="deleteArticle(${point.id})">Delete</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+
+              const dataDiv = document.getElementById('data');
+              if (data.items) {
+                  dataDiv.innerHTML = `<h2>${data.message}</h2><ul>${data.items.map(item => `<li>${item}</li>`).join('')}</ul>`;
+              } else {
+                  dataDiv.innerHTML = `<h2>${data.message}</h2><p>No items found.</p>`;
+              }
+          })
+          .catch(error => {
+              console.error('There was a problem with the fetch operation:', error);
+          });
+  </script>
+
     <div class="wrapper">
       <!-- Sidebar -->
       <div class="sidebar" data-background-color="dark">
@@ -365,74 +407,7 @@
   </div>
 </div>
 
-<script>
-  let dataStatistik = [];
-  let editIndex = -1;
 
-  // Fungsi untuk menambah atau mengedit data
-  function addData() {
-    const desa = document.getElementById('villageName').value;
-    const jumlahTerjangkit = document.getElementById('infectedCount').value;
-    const tahun = document.getElementById('year').value;
-
-    if (desa && jumlahTerjangkit && tahun) {
-      if (editIndex === -1) {
-        // Tambah data baru
-        dataStatistik.push({ desa, jumlahTerjangkit, tahun });
-      } else {
-        // Edit data yang ada
-        dataStatistik[editIndex] = { desa, jumlahTerjangkit, tahun };
-        editIndex = -1;
-      }
-
-      clearForm();
-      displayData();
-    }
-  }
-
-  // Fungsi untuk menghapus data
-  function deleteData(index) {
-    dataStatistik.splice(index, 1);
-    displayData();
-  }
-
-  // Fungsi untuk mengedit data
-  function editData(index) {
-    const data = dataStatistik[index];
-    document.getElementById('villageName').value = data.desa;
-    document.getElementById('infectedCount').value = data.jumlahTerjangkit;
-    document.getElementById('year').value = data.tahun;
-    editIndex = index;
-  }
-
-  // Fungsi untuk membersihkan form input
-  function clearForm() {
-    document.getElementById('villageName').value = '';
-    document.getElementById('infectedCount').value = '';
-    document.getElementById('year').value = '';
-  }
-
-  // Fungsi untuk menampilkan data ke tabel
-  function displayData() {
-    const tableBody = document.getElementById('statistikData');
-    tableBody.innerHTML = '';
-
-    dataStatistik.forEach((data, index) => {
-      const row = document.createElement('tr');
-      row.innerHTML = `
-        <td>${index + 1}</td>
-        <td>${data.desa}</td>
-        <td>${data.jumlahTerjangkit}</td>
-        <td>${data.tahun}</td>
-        <td>
-          <button class="btn btn-sm btn-warning" onclick="editData(${index})">Ubah</button>
-          <button class="btn btn-sm btn-danger" onclick="deleteData(${index})">Hapus</button>
-        </td>
-      `;
-      tableBody.appendChild(row);
-    });
-  }
-</script>
                   
     <!--   Core JS Files   -->
     <script src="assets/js/core/jquery-3.7.1.min.js"></script>
