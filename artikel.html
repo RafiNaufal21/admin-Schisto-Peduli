@@ -408,7 +408,19 @@
                           <option value="Seputar Keong">Seputar Keong</option>
                         </select>
                       </div>
-      
+                      
+                      <!--isi foto artikel-->
+                      <div class="form-group">
+                        <label for="foto">Unggah Foto</label>
+                        <input
+                          type="file"
+                          class="form-control"
+                          id="foto"
+                          accept="image/*"
+                        />
+                      </div>
+                
+
                       <!-- Isi Artikel -->
                       <div class="form-group">
                         <label for="articleContent">Isi Artikel</label>
@@ -495,58 +507,68 @@
 
 <!--tambah artikel-->
 <script>
-  function addPointData() {
+  async function addPointData() {
     const judul = document.getElementById('judul').value;
     const isi_artikel = document.getElementById('isi_artikel').value;
-    const subJudul = document.getElementById('subjudul').value; // Ubah nama variabel
-    const subDeskripsi = document.getElementById('deskripsi_subjudul').value; // Ubah nama variabel
-    const kategori = document.getElementById('kategori').value; // Ambil nilai dari kategori
-  
+    const subJudul = document.getElementById('subjudul').value;
+    const subDeskripsi = document.getElementById('deskripsi_subjudul').value;
+    const kategori = document.getElementById('kategori').value;
+    const fotoInput = document.getElementById("foto");
+
     // Validasi input
-    if (!judul || !isi_artikel || (!subJudul && !subDeskripsi)) {
-      alert('Semua field harus diisi!');
+    if (!judul || !isi_artikel || 
+        (subJudul && !subDeskripsi) || 
+        (!subJudul && subDeskripsi)) {
+      alert('Semua field harus diisi dengan benar!');
       return;
     }
-  
+
+    // Periksa apakah fotoInput ada dan apakah ada file yang diunggah
+    if (!fotoInput || !fotoInput.files.length) {
+      alert('Silakan unggah foto!');
+      return;
+    }
+
     const apiUrl = 'http://localhost:1945/artikel';
-    const data = {
-      judul: judul,
-      isi: isi_artikel, // Pastikan ini sesuai dengan API
-      subJudul: subJudul, // Pastikan ini sesuai dengan API
-      subDeskripsi: subDeskripsi, // Pastikan ini sesuai dengan API
-      kategori: kategori // Pastikan ini adalah string
-    };
+    const formData = new FormData();
+    
+    formData.append('judul', judul);
+    formData.append('isi', isi_artikel);
+    formData.append('subJudul', subJudul);
+    formData.append('subDeskripsi', subDeskripsi);
+    formData.append('kategori', kategori);
+    formData.append('foto', fotoInput.files[0]); // Ambil file yang diunggah
   
-    console.log('Data yang akan dikirim:', data);
-  
-    fetch(apiUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    })
-    .then(response => {
+    try {
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        body: formData, // Kirim FormData ke server
+      });
+
       if (!response.ok) {
-        return response.text().then(text => { throw new Error(text); });
+        const errorText = await response.text();
+        throw new Error(errorText);
       }
-      return response.json();
-    })
-    .then(data => {
+
+      const data = await response.json();
       console.log('Data berhasil dikirim:', data);
+      alert('Data berhasil dikirim!');
+      
       // Reset form setelah pengiriman
       document.getElementById('judul').value = '';
       document.getElementById('subjudul').value = '';
       document.getElementById('deskripsi_subjudul').value = '';
       document.getElementById('kategori').value = '';
+      fotoInput.value = ''; // Reset file input
       document.getElementById('isi_artikel').value = '';
-      alert('Data berhasil dikirim!');
-    })
-    .catch(error => {
+      location.reload();
+
+    } catch (error) {
       console.error('Ada masalah dengan permintaan:', error);
-    });
+      alert('Terjadi kesalahan: ' + error.message);
+    }
   }
-  </script>
+</script>
 
 <script>
   let currentPoint = null; // Variabel global untuk menyimpan data point yang diambil
